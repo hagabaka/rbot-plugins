@@ -30,8 +30,14 @@ require 'treetop'
 Treetop.load_from_string <<END_TREETOP_CODE
 
 grammar Shell
+  # this grammar accepts commands (strings) containing interpolations, marked by $( )
+  # it also provides an algorithm for executing the command with proper interpolation
+  
   rule command
     (interpolation / simple)+ {
+      # call this on the root of the parse tree
+      # the block should accept a string argument which is a command, and return a
+      # string which represents its result
       def execute(&block)
         yield elements.inject('') {|s, e| s + e.value(&block)}
       end
