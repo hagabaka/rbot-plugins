@@ -6,6 +6,23 @@
 # Author:: Yaohan Chen <yaohan.chen@gmail.com>
 # Copyright:: (C) 2008 Yaohan Chen
 # License:: GPLv2
+#
+#
+# Purpose
+#
+# This plugin allows interpolation of commands, similar to shells such as bash or sh.
+# 
+# Examples
+#
+#   shell say #mychannel $(help)
+#   shell say #mychannel $(help $(script echo 'auth'))
+#
+# Limitations
+#
+# * Interpolations only work when the command calls m.reply. For example, putting the
+#   "say" command inside interpolation does not produce anything
+# * Interpolations do not work with threaded commands, such as translator
+# * Currently there is no attempt to avoid deep recursion
 
 
 require 'treetop'
