@@ -10,7 +10,7 @@
 
 require 'treetop'
 
-Treetop.load_string <<END_TREETOP_CODE
+Treetop.load_from_string <<END_TREETOP_CODE
 
 grammar Shell
   rule command
