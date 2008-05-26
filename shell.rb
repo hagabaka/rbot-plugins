@@ -95,6 +95,6 @@ end
 
 
 plugin = ShellPlugin.new
-plugin.map 'shell *command'
+plugin.map 'shell *command', :threaded => true
 
 
