@@ -16,22 +16,22 @@ grammar Shell
   rule command
     (interpolation / simple)+ {
       def execute(&block)
-        yield elements.inject('') {|s, e| s + e.execute(&block)}
+        yield elements.inject('') {|s, e| s + e.value(&block)}
       end
     }
   end
 
   rule interpolation
     '$(' command ')' {
-      def execute(&block)
-        yield command.execute(&block)
+      def value(&block)
+        command.execute(&block)
       end
     }
   end
 
   rule simple
     (!'$(' !')' .)+ {
-      def execute(&block)
+      def value(&block)
         text_value
       end
     }
@@ -52,18 +52,19 @@ class ShellPlugin < Plugin
     unless tree
       m.reply(_('Malformed command %{command}') % {:command => params[:command].to_s})
     else
-      result = tree.execute do |s|
+      result = tree.execute do |cmd|
         replies = []
         # FIXME currently all the interpolated commands are created with :from => m,
         # so they are considered depth 1. maybe we should calculate the depth using
         # the command parse tree, but having the parse tree implies finite depth
-        new_m = fake_message(s, :from => m, :delegate => false)
+        new_m = fake_message(cmd, :from => m, :delegate => false)
         class << new_m
           self
-        end.send(:define_method, :reply) do |s|
-          replies << s
+        end.send(:define_method, :reply) do |r|
+          replies << r
         end
         @bot.plugins.irc_delegate('privmsg', new_m)
+        debug "command #{cmd} returned #{replies.join(' ')}"
         replies.join(' ')
       end
       m.reply result
