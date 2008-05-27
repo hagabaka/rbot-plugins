@@ -21,7 +21,6 @@
 #
 # * Interpolations only work when the command calls m.reply. For example, putting the
 #   "say" command inside interpolation does not produce anything
-# * Interpolations do not work with threaded commands, such as translator
 # * Currently there is no attempt to avoid deep recursion
 
 
@@ -81,13 +80,18 @@ class ShellPlugin < Plugin
         # so they are considered depth 1. maybe we should calculate the depth using
         # the command parse tree, but having the parse tree implies finite depth
         new_m = fake_message(cmd, :from => m, :delegate => false)
+
+        # Override new_m.reply to store replies
         class << new_m
           self
         end.send(:define_method, :reply) do |r|
           replies << r
         end
-        @bot.plugins.irc_delegate('privmsg', new_m)
-        debug "command #{cmd} returned #{replies.join(' ')}"
+
+        # Let the handler run unthreaded
+        new_m.thread = false
+
+        @bot.plugins.privmsg(new_m)
         replies.join(' ')
       end
       m.reply result
