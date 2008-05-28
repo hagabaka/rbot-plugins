@@ -44,15 +44,27 @@ grammar Shell
   end
 
   rule interpolation
-    '$(' command ')' {
+    open_interpolation command close_interpolation {
       def value(&block)
         command.execute(&block)
       end
     }
   end
 
+  rule open_interpolation
+    '$('
+  end
+  
+  rule close_interpolation
+    ')'
+  end
+
+  rule syntax_token
+    open_interpolation / close_interpolation
+  end
+
   rule simple
-    (!'$(' !')' .)+ {
+    (!syntax_token .)+ {
       def value(&block)
         text_value
       end
