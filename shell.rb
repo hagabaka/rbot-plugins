@@ -88,8 +88,8 @@ class ShellPlugin < Plugin
           replies << r
         end
 
-        # Let the handler run unthreaded
-        new_m.thread = false
+        # The shell command runs in thread so the handler can (must) run unthreaded
+        new_m.in_thread = true
 
         @bot.plugins.privmsg(new_m)
         replies.join(' ')
