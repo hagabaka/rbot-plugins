@@ -125,7 +125,7 @@ class ShellPlugin < Plugin
         @bot.plugins.privmsg(new_m)
         replies.join(' ')
       end
-      m.reply result
+      m.reply result unless result.empty?
     end
   end
 
