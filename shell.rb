@@ -33,7 +33,7 @@ grammar Shell
   # it also provides an algorithm for executing the command with proper interpolation
   
   rule command
-    (interpolation / simple)+ {
+    (interpolation / literal)+ {
       # call this on the root of the parse tree
       # the block should accept a string argument which is a command, and return a
       # string which represents its result
@@ -62,11 +62,27 @@ grammar Shell
   rule syntax_token
     open_interpolation / close_interpolation
   end
-
-  rule simple
-    (!syntax_token .)+ {
+  
+  rule literal
+    (escape / plain)+ {
+      def value(&block)
+        elements.inject('') {|s, e| s + e.value(&block)}
+      end
+    }
+  end
+  
+  rule plain
+    !syntax_token . {
       def value(&block)
         text_value
+      end
+    }
+  end
+ 
+  rule escape
+    '\' content:('\' / syntax_token / .) {
+      def value(&block)
+        content.text_value
       end
     }
   end
