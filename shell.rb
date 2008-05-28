@@ -16,6 +16,7 @@
 #
 #   shell say #mychannel $(help)
 #   shell say #mychannel $(help $(script echo 'auth'))
+#   shell say #mychannel "\$(" and "\)" can be escaped with "\\" (backslash)
 #
 # Limitations
 #
@@ -78,9 +79,11 @@ grammar Shell
       end
     }
   end
- 
+
+  # the quadraple backslashes actually only stand for singles, they're there because
+  # ruby and treetop both use double backslash to escape for single backslash
   rule escape
-    '\' content:('\' / syntax_token / .) {
+    '\\\\' content:('\\\\' / syntax_token / .) {
       def value(&block)
         content.text_value
       end
