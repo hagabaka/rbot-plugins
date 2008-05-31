@@ -27,7 +27,7 @@
 
 require 'treetop'
 
-Treetop.load_from_string <<END_TREETOP_CODE
+Treetop.load_from_string <<'END_TREETOP_CODE'
 
 grammar Shell
   # this grammar accepts commands (strings) containing interpolations, marked by $( )
@@ -80,10 +80,10 @@ grammar Shell
     }
   end
 
-  # the quadraple backslashes actually only stand for singles, they're there because
-  # ruby and treetop both use double backslash to escape for single backslash
+  # double backslashes actually only stand for singles, because treetop uses \
+  # for escaping too
   rule escape
-    '\\\\' content:('\\\\' / syntax_token / .) {
+    '\\' content:('\\' / syntax_token / .) {
       def value(&block)
         content.text_value
       end
